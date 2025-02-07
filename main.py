@@ -82,13 +82,18 @@ st.markdown(
     .stMarkdown {color: black !important; font-family: 'Poppins', sans-serif;}
     .stApp>header {display: none !important;}
     .stButton>button {
-        background-color: gold !important;
+        background-color: #FFD700 !important;
         color: black !important;
+        border: none !important;
         border-radius: 8px;
-        padding: 10px 20px;
+        padding: 12px 24px;
         font-size: 16px;
         font-weight: bold;
+        cursor: pointer;
         box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    .stButton>button:hover {
+        background-color: #FFC107 !important;
     }
     </style>
     """,
