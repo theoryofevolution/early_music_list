@@ -38,46 +38,34 @@ def check_access_key():
         return False
     return True
 
-# Function to display audio files with auto-hide after full play
+# Function to display audio files
 def display_audio_files():
-    if "hidden_files" not in st.session_state:
-        st.session_state["hidden_files"] = set()
-
     audio_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith(".mp3") or f.endswith(".m4a")]
     if not audio_files:
         st.write("No music available yet.")
     else:
         for file in audio_files:
-            if file not in st.session_state["hidden_files"]:
-                file_path = os.path.join(UPLOAD_FOLDER, file)
-                st.markdown(
-                    f"""
-                    <div style="
-                        background-color: #FFD700;
-                        padding: 15px;
-                        border-radius: 12px;
-                        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-                        text-align: center;
-                        margin-bottom: 10px;
-                        font-family: 'Poppins', sans-serif;
-                    ">
-                        <h3 style="color: black;">🎵 {file}</h3>
-                        <audio id="audio_{file}" controls style="width: 100%;" controlsList="nodownload">
-                            <source src="{UPLOAD_FOLDER}/{file}" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
-                    </div>
-                    <script>
-                        document.getElementById("audio_{file}").addEventListener("ended", function() {{
-                            var hiddenFiles = JSON.parse(localStorage.getItem("hidden_files") || "[]");
-                            hiddenFiles.push("{file}");
-                            localStorage.setItem("hidden_files", JSON.stringify(hiddenFiles));
-                            window.location.reload();
-                        }});
-                    </script>
-                    """,
-                    unsafe_allow_html=True,
-                )
+            file_path = os.path.join(UPLOAD_FOLDER, file)
+            st.markdown(
+                f"""
+                <div style="
+                    background-color: #FFD700;
+                    padding: 15px;
+                    border-radius: 12px;
+                    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+                    text-align: center;
+                    margin-bottom: 10px;
+                    font-family: 'Poppins', sans-serif;
+                ">
+                    <h3 style="color: black;">🎵 {file}</h3>
+                    <audio controls style="width: 100%;" controlsList="nodownload">
+                        <source src="{UPLOAD_FOLDER}/{file}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 # Streamlit UI
 st.markdown(
