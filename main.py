@@ -49,27 +49,26 @@ def display_audio_files():
     else:
         for file in audio_files:
             file_path = os.path.join(UPLOAD_FOLDER, file)
-            with st.container():
-                st.markdown(
-                    f"""
-                    <div style="
-                        background-color: #FFD700;
-                        padding: 15px;
-                        border-radius: 12px;
-                        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-                        text-align: center;
-                        margin-bottom: 10px;
-                        font-family: 'Poppins', sans-serif;
-                    ">
-                        <h3 style="color: black;">🎵 {file}</h3>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-                if file.endswith(".mp3"):
-                    st.audio(file_path, format='audio/mp3')
-                elif file.endswith(".m4a"):
-                    st.audio(file_path, format='audio/m4a')
+            st.markdown(
+                f"""
+                <div style="
+                    background-color: #FFD700;
+                    padding: 15px;
+                    border-radius: 12px;
+                    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+                    text-align: center;
+                    margin-bottom: 10px;
+                    font-family: 'Poppins', sans-serif;
+                ">
+                    <h3 style="color: black;">🎵 {file}</h3>
+                    <audio controls style="width: 100%;" controlsList="nodownload">
+                        <source src="{UPLOAD_FOLDER}/{file}" type="audio/mp3">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 # Streamlit UI
 st.markdown(
