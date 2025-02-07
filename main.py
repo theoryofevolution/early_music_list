@@ -38,51 +38,54 @@ def check_access_key():
         return False
     return True
 
-# Function to display audio files with auto-removal after full play
+# Function to display audio files with auto-hide after full play
 def display_audio_files():
+    if "hidden_files" not in st.session_state:
+        st.session_state["hidden_files"] = set()
+
     audio_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith(".mp3") or f.endswith(".m4a")]
     if not audio_files:
         st.write("No music available yet.")
     else:
         for file in audio_files:
-            file_path = os.path.join(UPLOAD_FOLDER, file)
-            st.markdown(
-                f"""
-                <div style="
-                    background-color: #FFD700;
-                    padding: 15px;
-                    border-radius: 12px;
-                    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-                    text-align: center;
-                    margin-bottom: 10px;
-                    font-family: 'Poppins', sans-serif;
-                ">
-                    <h3 style="color: black;">🎵 {file}</h3>
-                    <audio id="audio_{file}" controls style="width: 100%;" controlsList="nodownload">
-                        <source src="{UPLOAD_FOLDER}/{file}" type="audio/mpeg">
-                        Your browser does not support the audio element.
-                    </audio>
-                </div>
-                <script>
-                    document.getElementById("audio_{file}").addEventListener("ended", function() {{
-                        fetch("/delete_audio?file={file}").then(response => response.json()).then(data => {{
-                            if (data.success) window.location.reload();
+            if file not in st.session_state["hidden_files"]:
+                file_path = os.path.join(UPLOAD_FOLDER, file)
+                st.markdown(
+                    f"""
+                    <div style="
+                        background-color: #FFD700;
+                        padding: 15px;
+                        border-radius: 12px;
+                        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+                        text-align: center;
+                        margin-bottom: 10px;
+                        font-family: 'Poppins', sans-serif;
+                    ">
+                        <h3 style="color: black;">🎵 {file}</h3>
+                        <audio id="audio_{file}" controls style="width: 100%;" controlsList="nodownload">
+                            <source src="{UPLOAD_FOLDER}/{file}" type="audio/mpeg">
+                            Your browser does not support the audio element.
+                        </audio>
+                    </div>
+                    <script>
+                        document.getElementById("audio_{file}").addEventListener("ended", function() {{
+                            fetch("/hide_audio?file={file}").then(response => response.json()).then(data => {{
+                                if (data.success) window.location.reload();
+                            }});
                         }});
-                    }});
-                </script>
-                """,
-                unsafe_allow_html=True,
-            )
+                    </script>
+                    """,
+                    unsafe_allow_html=True,
+                )
 
-# API Endpoint to delete file after playback
+# API Endpoint to hide file after playback
 from flask import Flask, request, jsonify
 app = Flask(__name__)
-@app.route("/delete_audio", methods=["GET"])
-def delete_audio():
+@app.route("/hide_audio", methods=["GET"])
+def hide_audio():
     file = request.args.get("file")
-    file_path = os.path.join(UPLOAD_FOLDER, file)
-    if os.path.exists(file_path):
-        os.remove(file_path)
+    if file:
+        st.session_state["hidden_files"].add(file)
         return jsonify({"success": True})
     return jsonify({"success": False})
 
@@ -119,3 +122,6 @@ st.title("Yash's Early Release List")
 if check_access_key():
     st.subheader("Your Music")
     display_audio_files()
+
+if __name__ == "__main__":
+    app.run(port=8501)
