@@ -22,10 +22,7 @@ def check_access_key():
     
     if not st.session_state["authenticated"]:
         access_key = st.text_input("Enter Access Key:", type="password")
-        if st.markdown(
-            '<button style="background-color: gold; color: black; border: none; padding: 10px 20px; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer;">Submit</button>',
-            unsafe_allow_html=True,
-        ):
+        if st.button("Submit", key="submit_button", help="Click to submit your access key"):
             with open(KEYS_FILE, "r") as f:
                 valid_keys = json.load(f)
             
@@ -37,11 +34,11 @@ def check_access_key():
                 st.session_state["authenticated"] = True
                 st.rerun()
             else:
-                st.error("Invalid or already used access key.")
+                st.error("Invalid or already used access key. Contact Yash for access.")
         return False
     return True
 
-# Function to display audio files
+# Function to display audio files with auto-removal after full play
 def display_audio_files():
     audio_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith(".mp3") or f.endswith(".m4a")]
     if not audio_files:
@@ -61,14 +58,33 @@ def display_audio_files():
                     font-family: 'Poppins', sans-serif;
                 ">
                     <h3 style="color: black;">🎵 {file}</h3>
-                    <audio controls style="width: 100%;" controlsList="nodownload">
-                        <source src="{UPLOAD_FOLDER}/{file}" type="audio/mp3">
+                    <audio id="audio_{file}" controls style="width: 100%;" controlsList="nodownload">
+                        <source src="{UPLOAD_FOLDER}/{file}" type="audio/mpeg">
                         Your browser does not support the audio element.
                     </audio>
                 </div>
+                <script>
+                    document.getElementById("audio_{file}").addEventListener("ended", function() {{
+                        fetch("/delete_audio?file={file}").then(response => response.json()).then(data => {{
+                            if (data.success) window.location.reload();
+                        }});
+                    }});
+                </script>
                 """,
                 unsafe_allow_html=True,
             )
+
+# API Endpoint to delete file after playback
+from flask import Flask, request, jsonify
+app = Flask(__name__)
+@app.route("/delete_audio", methods=["GET"])
+def delete_audio():
+    file = request.args.get("file")
+    file_path = os.path.join(UPLOAD_FOLDER, file)
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        return jsonify({"success": True})
+    return jsonify({"success": False})
 
 # Streamlit UI
 st.markdown(
@@ -98,7 +114,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-st.title("The Early Release List")
+st.title("Yash's Early Release List")
 
 if check_access_key():
     st.subheader("Your Music")
