@@ -69,25 +69,15 @@ def display_audio_files():
                     </div>
                     <script>
                         document.getElementById("audio_{file}").addEventListener("ended", function() {{
-                            fetch("/hide_audio?file={file}").then(response => response.json()).then(data => {{
-                                if (data.success) window.location.reload();
-                            }});
+                            var hiddenFiles = JSON.parse(localStorage.getItem("hidden_files") || "[]");
+                            hiddenFiles.push("{file}");
+                            localStorage.setItem("hidden_files", JSON.stringify(hiddenFiles));
+                            window.location.reload();
                         }});
                     </script>
                     """,
                     unsafe_allow_html=True,
                 )
-
-# API Endpoint to hide file after playback
-from flask import Flask, request, jsonify
-app = Flask(__name__)
-@app.route("/hide_audio", methods=["GET"])
-def hide_audio():
-    file = request.args.get("file")
-    if file:
-        st.session_state["hidden_files"].add(file)
-        return jsonify({"success": True})
-    return jsonify({"success": False})
 
 # Streamlit UI
 st.markdown(
@@ -122,6 +112,3 @@ st.title("Yash's Early Release List")
 if check_access_key():
     st.subheader("Your Music")
     display_audio_files()
-
-if __name__ == "__main__":
-    app.run(port=8501)
