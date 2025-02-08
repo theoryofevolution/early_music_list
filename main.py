@@ -22,15 +22,13 @@ def check_access_key():
 
     if not st.session_state["authenticated"]:
         access_key = st.text_input("🔑 Enter Access Key:", type="password")
-        if st.button("Submit", key="submit_button", help="Click to submit your access key"):
+        if st.button("Submit", key="submit_button"):
             with open(KEYS_FILE, "r") as f:
                 valid_keys = json.load(f)
-
             if access_key in valid_keys:
-                del valid_keys[access_key]  # Remove key after first use
+                del valid_keys[access_key]
                 with open(KEYS_FILE, "w") as f:
                     json.dump(valid_keys, f)
-                
                 st.session_state["authenticated"] = True
                 st.rerun()
             else:
@@ -48,7 +46,7 @@ def display_audio_files():
             st.markdown(f"<h3 style='color: #FFD700;'>🎵 {file}</h3>", unsafe_allow_html=True)
             st.audio(file_path)
 
-# Streamlit UI with fancy styling
+# Streamlit UI
 st.markdown(
     """
     <style>
@@ -58,43 +56,27 @@ st.markdown(
         color: #FFD700 !important;
         font-weight: bold;
     }
-    .stButton>button {
-        background-color: #FFD700 !important;
-        color: black !important;
-        border: none !important;
-        border-radius: 8px;
-        padding: 12px 24px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-    }
-    .stButton>button:hover {
-        background-color: #FFC107 !important;
-    }
-    .stTextInput>div>div>input {
-        background-color: #333 !important;
-        color: white !important;
-        border: 1px solid #FFD700 !important;
-        border-radius: 6px;
-        font-size: 14px;
-        padding: 10px;
-    }
-    .stTextInput>div>div>label {
-        color: #FFD700 !important;
-        font-weight: bold;
-    }
-    .block-container {
-        padding: 2rem;
-        background-color: #2a2a2a;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    }
-    header {display: none !important;}
+    header {display: none !important;}  /* This hides the header */
     .stToolbar {display: none !important;}
     </style>
     """,
     unsafe_allow_html=True,
+)
+
+# Injecting JavaScript to hide the top bar
+st.components.v1.html(
+    """
+    <script>
+        const interval = setInterval(() => {
+            const topBar = window.parent.document.querySelector('header');
+            if (topBar) {
+                topBar.style.display = 'none';
+                clearInterval(interval);
+            }
+        }, 100);
+    </script>
+    """,
+    height=0,
 )
 
 st.title("🌟 The Early Release List")
