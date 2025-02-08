@@ -33,6 +33,9 @@ def display_audio_files():
             st.markdown("<hr style='border: 0.5px solid #ddd;'>", unsafe_allow_html=True)
 
 # Function to handle the access key submission
+# Define a master password
+MASTER_PASSWORD = "supersecretpassword"  # Change this to your desired master password
+
 # Function to handle access key submission
 def handle_access_key_submission():
     access_keys = load_access_keys()
@@ -45,11 +48,15 @@ def handle_access_key_submission():
     with submit_col:
         if st.button("Submit"):
             st.session_state["submitted"] = True
-            if access_key in access_keys:
+            if access_key in access_keys or access_key == MASTER_PASSWORD:
                 st.session_state["authenticated"] = True
-                st.session_state["user_name"] = access_keys[access_key]
-                del access_keys[access_key]
-                save_access_keys(access_keys)
+                st.session_state["user_name"] = access_keys.get(access_key, "Master User")
+                
+                # Remove the access key from the file if it’s not the master password
+                if access_key != MASTER_PASSWORD:
+                    del access_keys[access_key]
+                    save_access_keys(access_keys)
+                
                 st.rerun()
             else:
                 st.session_state["invalid_key"] = True
