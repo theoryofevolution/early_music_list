@@ -92,5 +92,5 @@ st.components.v1.html(
 st.title("The Early Release List")
 
 if check_access_key():
-    st.subheader("🎧 Your Music Collection")
+    st.subheader("Music")
     display_audio_files()
