@@ -82,7 +82,7 @@ st.markdown(
     .stMarkdown {color: black !important; font-family: 'Poppins', sans-serif;}
     .stApp>header {display: none !important;}
     .stButton>button {
-        background-color: #FFD700 !important;
+        background-color: gold !important;
         color: black !important;
         border: none !important;
         border-radius: 8px;
