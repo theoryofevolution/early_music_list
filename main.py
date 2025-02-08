@@ -21,35 +21,37 @@ def save_access_keys(access_keys):
     with open(ACCESS_KEY_FILE, "w") as file:
         json.dump(access_keys, file, indent=4)
 
-# Function to display only the most recent audio file
-def display_latest_audio_file():
+# Function to display the audio files
+def display_audio_files():
     st.markdown("<h2 style='text-align: center;'>l'avant-première</h2>", unsafe_allow_html=True)
     st.markdown("<hr style='border: 1px solid #ccc; margin: 20px 0;'>", unsafe_allow_html=True)
     
-    audio_files = sorted([f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".mp3", ".m4a"))], reverse=True)
+    audio_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".mp3", ".m4a"))]
     if not audio_files:
         st.write("🎶 No music available yet.")
     else:
-        latest_file = audio_files[0]
-        abs_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, latest_file))
-        st.markdown(f"**{latest_file}**")
-        st.audio(abs_path)
+        for file in audio_files:
+            abs_path = os.path.abspath(os.path.join(UPLOAD_FOLDER, file))
+            st.markdown(f"**{file}**")
+            st.audio(abs_path)
+            st.markdown("<hr style='border: 0.5px solid #ddd;'>", unsafe_allow_html=True)
 
-# Master user dashboard for managing access keys and uploading music
+# Master user dashboard for managing access keys
 def master_user_dashboard():
     st.markdown("<h2 style='text-align: center;'>Master User Dashboard</h2>", unsafe_allow_html=True)
     
-    # Access key management
-    st.markdown("### Manage Access Keys")
+    # Load current access keys
     access_keys = load_access_keys()
     
     # Display existing keys
+    st.markdown("### Existing Access Keys:")
     if access_keys:
-        st.markdown("**Existing Access Keys:**")
         for key, name in access_keys.items():
             st.write(f"**{key}** → {name}")
     else:
         st.write("No access keys available.")
+    
+    st.markdown("<hr>", unsafe_allow_html=True)
     
     # Form to add a new access key
     st.markdown("### Add a New Access Key")
@@ -61,23 +63,9 @@ def master_user_dashboard():
             access_keys[new_access_key] = new_user_name
             save_access_keys(access_keys)
             st.success(f"Access key for {new_user_name} added successfully!")
-            st.rerun()
+            st.rerun()  # Refresh the page to show the new key
         else:
             st.error("Please fill in both the user name and access key.")
-    
-    st.markdown("<hr>", unsafe_allow_html=True)
-    
-    # Music upload section
-    st.markdown("### Upload New Music")
-    uploaded_file = st.file_uploader("Choose a music file (.mp3 or .m4a)", type=["mp3", "m4a"])
-    
-    if uploaded_file:
-        # Save the uploaded file
-        file_path = os.path.join(UPLOAD_FOLDER, uploaded_file.name)
-        with open(file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        st.success(f"{uploaded_file.name} uploaded successfully!")
-        st.rerun()
 
 # Function to handle access key submission
 def handle_access_key_submission():
@@ -113,7 +101,7 @@ if "authenticated" in st.session_state and st.session_state["authenticated"]:
         master_user_dashboard()
     else:
         st.markdown(f"<h2 style='text-align: center;'>Welcome, {st.session_state['user_name']}!</h2>", unsafe_allow_html=True)
-        display_latest_audio_file()
+        display_audio_files()
 else:
     st.markdown("<h2 style='text-align: center;'>🔑 Enter Access Key</h2>", unsafe_allow_html=True)
     handle_access_key_submission()
