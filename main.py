@@ -34,7 +34,7 @@ def check_access_key():
                 st.session_state["authenticated"] = True
                 st.rerun()
             else:
-                st.error("Invalid or already used access key. Contact Yash for access.")
+                st.error("Invalid or already used access key.")
         return False
     return True
 
@@ -81,18 +81,18 @@ st.markdown(
     label {color: black !important; font-weight: bold; font-family: 'Poppins', sans-serif;}
     .stMarkdown {color: black !important; font-family: 'Poppins', sans-serif;}
     .stApp>header {display: none !important;}
-    .stButton>div>button {
+    .stButton>button {
         background-color: gold !important;
         color: black !important;
         border: none !important;
-        border-radius: 8px !important;
-        padding: 12px 24px !important;
-        font-size: 16px !important;
-        font-weight: bold !important;
-        cursor: pointer !important;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2) !important;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
     }
-    .stButton>div>button:hover {
+    .stButton>button:hover {
         background-color: #FFC107 !important;
     }
     </style>
@@ -100,8 +100,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-
-st.title("Yash's Early Release List")
+st.title("The Early Release List")
 
 if check_access_key():
     st.subheader("Your Music")
