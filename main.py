@@ -45,33 +45,26 @@ def display_audio_files():
     else:
         for file in audio_files:
             file_path = os.path.join(UPLOAD_FOLDER, file)
-            try:
-                with open(file_path, "rb") as audio_file:
-                    audio_data = audio_file.read()
-                    audio_base64 = base64.b64encode(audio_data).decode("utf-8")
-                
-                st.markdown(
-                    f"""
-                    <div style="
-                        background-color: #FFD700;
-                        padding: 15px;
-                        border-radius: 12px;
-                        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-                        text-align: center;
-                        margin-bottom: 10px;
-                        font-family: 'Poppins', sans-serif;
-                    ">
-                        <h3 style="color: black;">🎵 {file}</h3>
-                        <audio controls style="width: 100%;" controlsList="nodownload">
-                            <source src="data:audio/mpeg;base64,{audio_base64}" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-            except Exception as e:
-                st.error(f"Failed to load {file}. Error: {str(e)}")
+            st.markdown(
+                f"""
+                <div style="
+                    background-color: #FFD700;
+                    padding: 15px;
+                    border-radius: 12px;
+                    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+                    text-align: center;
+                    margin-bottom: 10px;
+                    font-family: 'Poppins', sans-serif;
+                ">
+                    <h3 style="color: black;">🎵 {file}</h3>
+                    <audio controls style="width: 100%;" controlsList="nodownload">
+                        <source src="{file_path}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 # Streamlit UI
 st.markdown(
