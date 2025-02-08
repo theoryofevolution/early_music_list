@@ -90,12 +90,15 @@ st.markdown(
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
     }
+    header {display: none !important;}
+    .stToolbar {display: none !important;}
     </style>
     """,
     unsafe_allow_html=True,
 )
 
-st.title("The Early Release List")
+st.title("🌟 The Early Release List")
 
 if check_access_key():
+    st.subheader("🎧 Your Music Collection")
     display_audio_files()
