@@ -59,7 +59,7 @@ def display_audio_files():
                 ">
                     <h3 style="color: black;">🎵 {file}</h3>
                     <audio controls style="width: 100%;" controlsList="nodownload">
-                        <source src="{UPLOAD_FOLDER}/{file}" type="audio/mpeg">
+                        <source src="{file_path}" type="audio/mpeg">
                         Your browser does not support the audio element.
                     </audio>
                 </div>
