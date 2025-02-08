@@ -5,8 +5,14 @@ import json
 # Constants
 UPLOAD_FOLDER = "uploads"
 ACCESS_KEY_FILE = "access_keys.json"
-MASTER_PASSWORD = "supersecretpassword"  # Change this to your desired master password
+HIDDEN_SONGS_FILE = "hidden_songs.json"
+MASTER_PASSWORD = "supersecretpassword"
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
+# Ensure the hidden songs file exists
+if not os.path.exists(HIDDEN_SONGS_FILE):
+    with open(HIDDEN_SONGS_FILE, "w") as file:
+        json.dump([], file)  # Create an empty list
 
 # Load access keys from the JSON file
 def load_access_keys():
@@ -21,12 +27,24 @@ def save_access_keys(access_keys):
     with open(ACCESS_KEY_FILE, "w") as file:
         json.dump(access_keys, file, indent=4)
 
-# Function to display only the most recent audio file
+# Load hidden songs from the JSON file
+def load_hidden_songs():
+    with open(HIDDEN_SONGS_FILE, "r") as file:
+        return json.load(file)
+
+# Save hidden songs to the JSON file
+def save_hidden_songs(hidden_songs):
+    with open(HIDDEN_SONGS_FILE, "w") as file:
+        json.dump(hidden_songs, file, indent=4)
+
+# Function to display only the most recent non-hidden audio file
 def display_latest_audio_file():
     st.markdown("<h2 style='text-align: center;'>l'avant-première</h2>", unsafe_allow_html=True)
     st.markdown("<hr style='border: 1px solid #ccc; margin: 20px 0;'>", unsafe_allow_html=True)
     
-    audio_files = sorted([f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".mp3", ".m4a"))], reverse=True)
+    hidden_songs = load_hidden_songs()
+    audio_files = sorted([f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".mp3", ".m4a")) and f not in hidden_songs], reverse=True)
+    
     if not audio_files:
         st.write("🎶 No music available yet.")
     else:
@@ -35,7 +53,7 @@ def display_latest_audio_file():
         st.markdown(f"**{latest_file}**")
         st.audio(abs_path)
 
-# Master user dashboard for managing access keys and uploading/deleting music
+# Master user dashboard for managing access keys and uploading/hiding/deleting music
 def master_user_dashboard():
     st.markdown("<h2 style='text-align: center;'>Master User Dashboard</h2>", unsafe_allow_html=True)
     
@@ -43,11 +61,17 @@ def master_user_dashboard():
     st.markdown("### Manage Access Keys")
     access_keys = load_access_keys()
     
-    # Display existing keys
+    # Display existing keys with remove option
     if access_keys:
         st.markdown("**Existing Access Keys:**")
-        for key, name in access_keys.items():
-            st.write(f"**{key}** → {name}")
+        for key, name in list(access_keys.items()):
+            col1, col2 = st.columns([8, 2])
+            col1.write(f"**{key}** → {name}")
+            if col2.button("❌ Remove", key=f"remove_{key}"):
+                del access_keys[key]
+                save_access_keys(access_keys)
+                st.success(f"Access key for {name} has been removed.")
+                st.rerun()
     else:
         st.write("No access keys available.")
     
@@ -81,19 +105,33 @@ def master_user_dashboard():
 
     # Music management section
     st.markdown("### Manage Uploaded Music")
+    hidden_songs = load_hidden_songs()
     audio_files = sorted([f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".mp3", ".m4a"))], reverse=True)
     
     if not audio_files:
         st.write("No music uploaded yet.")
     else:
         for file in audio_files:
-            col1, col2 = st.columns([8, 2])
+            col1, col2, col3 = st.columns([6, 2, 2])
             col1.write(f"**{file}**")
-            if col2.button("❌ Remove", key=f"remove_{file}"):
-                file_path = os.path.join(UPLOAD_FOLDER, file)
-                os.remove(file_path)
-                st.success(f"{file} has been removed.")
-                st.rerun()
+            if file in hidden_songs:
+                col2.write("🔒 Hidden")
+                if col3.button("📂 Unhide", key=f"unhide_{file}"):
+                    hidden_songs.remove(file)
+                    save_hidden_songs(hidden_songs)
+                    st.success(f"{file} is now visible.")
+                    st.rerun()
+            else:
+                if col2.button("🔒 Hide", key=f"hide_{file}"):
+                    hidden_songs.append(file)
+                    save_hidden_songs(hidden_songs)
+                    st.success(f"{file} has been hidden.")
+                    st.rerun()
+                if col3.button("❌ Remove", key=f"remove_{file}"):
+                    file_path = os.path.join(UPLOAD_FOLDER, file)
+                    os.remove(file_path)
+                    st.success(f"{file} has been removed.")
+                    st.rerun()
 
 # Function to handle access key submission
 def handle_access_key_submission():
