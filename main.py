@@ -46,22 +46,22 @@ def display_audio_files():
             st.markdown(f"<h3 style='color: #FFD700; text-align: center;'>🎵 {file}</h3>", unsafe_allow_html=True)
             st.audio(file_path)
 
-# Streamlit UI with fancy centered styling
+# Streamlit UI with centered styling and white background
 st.markdown(
     """
     <style>
-    body {background-color: #1e1e1e; color: white; font-family: 'Poppins', sans-serif;}
-    .stApp {background-color: #1e1e1e; color: white; font-family: 'Poppins', sans-serif;}
+    body {background-color: white; color: black; font-family: 'Poppins', sans-serif;}
+    .stApp {background-color: white; color: black; font-family: 'Poppins', sans-serif;}
     h1, h2, h3, h4, h5, h6 {
-        color: #FFD700 !important;
+        color: #333 !important;
         font-weight: bold;
         text-align: center;
     }
     .block-container {
         padding: 2rem;
-        background-color: #2a2a2a;
+        background-color: #f9f9f9;
         border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         max-width: 800px;
         margin: auto;
     }
