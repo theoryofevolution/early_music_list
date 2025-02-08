@@ -39,14 +39,14 @@ def check_access_key():
 def display_audio_files():
     audio_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith(".mp3") or f.endswith(".m4a")]
     if not audio_files:
-        st.write("🎶 No music available yet.")
+        st.write("<div style='text-align: center;'>🎶 No music available yet.</div>", unsafe_allow_html=True)
     else:
         for file in audio_files:
             file_path = os.path.join(UPLOAD_FOLDER, file)
-            st.markdown(f"<h3 style='color: #FFD700;'>🎵 {file}</h3>", unsafe_allow_html=True)
+            st.markdown(f"<h3 style='color: #FFD700; text-align: center;'>🎵 {file}</h3>", unsafe_allow_html=True)
             st.audio(file_path)
 
-# Streamlit UI
+# Streamlit UI with fancy centered styling
 st.markdown(
     """
     <style>
@@ -55,8 +55,17 @@ st.markdown(
     h1, h2, h3, h4, h5, h6 {
         color: #FFD700 !important;
         font-weight: bold;
+        text-align: center;
     }
-    header {display: none !important;}  /* This hides the header */
+    .block-container {
+        padding: 2rem;
+        background-color: #2a2a2a;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        max-width: 800px;
+        margin: auto;
+    }
+    header {display: none !important;}
     .stToolbar {display: none !important;}
     </style>
     """,
@@ -79,7 +88,8 @@ st.components.v1.html(
     height=0,
 )
 
-st.title("🌟 The Early Release List")
+# Centered title and subheader
+st.title("The Early Release List")
 
 if check_access_key():
     st.subheader("🎧 Your Music Collection")
