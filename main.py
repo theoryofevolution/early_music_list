@@ -1,96 +1,39 @@
 import streamlit as st
 import os
-import json
 
 # Constants
-KEYS_FILE = "access_keys.json"
 UPLOAD_FOLDER = "uploads"
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Ensure the upload folder exists
 
-# Ensure upload folder exists
-if not os.path.exists(UPLOAD_FOLDER):
-    os.makedirs(UPLOAD_FOLDER)
-
-# Ensure keys file exists
-if not os.path.exists(KEYS_FILE):
-    with open(KEYS_FILE, "w") as f:
-        json.dump({}, f)
-
-# Function to check access key
+# Function to check access key using st.secrets
 def check_access_key():
     if "authenticated" not in st.session_state:
         st.session_state["authenticated"] = False
 
     if not st.session_state["authenticated"]:
         access_key = st.text_input("🔑 Enter Access Key:", type="password")
-        if st.button("Submit", key="submit_button"):
-            with open(KEYS_FILE, "r") as f:
-                valid_keys = json.load(f)
-            if access_key in valid_keys:
-                del valid_keys[access_key]
-                with open(KEYS_FILE, "w") as f:
-                    json.dump(valid_keys, f)
+        if st.button("Submit"):
+            if access_key == st.secrets["ACCESS_KEY"]:  # Use Streamlit's secrets for secure access keys
                 st.session_state["authenticated"] = True
+                st.success("Access granted.")
                 st.rerun()
             else:
-                st.error("❌ Invalid or already used access key.")
+                st.error("❌ Invalid access key.")
         return False
     return True
 
+# Function to display audio files
 def display_audio_files():
-    audio_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith(".mp3") or f.endswith(".m4a")]
+    audio_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith((".mp3", ".m4a"))]
     if not audio_files:
-        st.write("<div style='text-align: center;'>🎶 No music available yet.</div>", unsafe_allow_html=True)
+        st.write("🎶 No music available yet.")
     else:
         for file in audio_files:
-            file_path = os.path.join(UPLOAD_FOLDER, file)
-            st.markdown(f"<h3 style='color: #FFD700; text-align: center;'>🎵 {file}</h3>", unsafe_allow_html=True)
-            st.audio(file_path)
+            st.markdown(f"<h3 style='text-align: center;'>🎵 {file}</h3>", unsafe_allow_html=True)
+            st.audio(os.path.join(UPLOAD_FOLDER, file))
 
-# Streamlit UI with centered styling and white background
-st.markdown(
-    """
-    <style>
-    body {background-color: white; color: black; font-family: 'Poppins', sans-serif;}
-    .stApp {background-color: white; color: black; font-family: 'Poppins', sans-serif;}
-    h1, h2, h3, h4, h5, h6 {
-        color: #333 !important;
-        font-weight: bold;
-        text-align: center;
-    }
-    .block-container {
-        padding: 2rem;
-        background-color: #f9f9f9;
-        border-radius: 12px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        max-width: 800px;
-        margin: auto;
-    }
-    header {display: none !important;}
-    .stToolbar {display: none !important;}
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
-# Injecting JavaScript to hide the top bar
-st.components.v1.html(
-    """
-    <script>
-        const interval = setInterval(() => {
-            const topBar = window.parent.document.querySelector('header');
-            if (topBar) {
-                topBar.style.display = 'none';
-                clearInterval(interval);
-            }
-        }, 100);
-    </script>
-    """,
-    height=0,
-)
-
-# Centered title and subheader
+# Streamlit UI with minimal styling
 st.title("The Early Release List")
-
 if check_access_key():
     st.subheader("Music")
     display_audio_files()
