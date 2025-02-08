@@ -38,7 +38,8 @@ def check_access_key():
         return False
     return True
 
-# Function to display audio files
+import base64
+
 def display_audio_files():
     audio_files = [f for f in os.listdir(UPLOAD_FOLDER) if f.endswith(".mp3") or f.endswith(".m4a")]
     if not audio_files:
@@ -47,27 +48,29 @@ def display_audio_files():
         for file in audio_files:
             file_path = os.path.join(UPLOAD_FOLDER, file)
             with open(file_path, "rb") as audio_file:
-                audio_bytes = audio_file.read()
-                st.markdown(
-                    f"""
-                    <div style="
-                        background-color: #FFD700;
-                        padding: 15px;
-                        border-radius: 12px;
-                        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-                        text-align: center;
-                        margin-bottom: 10px;
-                        font-family: 'Poppins', sans-serif;
-                    ">
-                        <h3 style="color: black;">🎵 {file}</h3>
-                        <audio controls style="width: 100%;" controlsList="nodownload">
-                            <source src="data:audio/mpeg;base64,{audio_bytes.decode('latin-1')}" type="audio/mpeg">
-                            Your browser does not support the audio element.
-                        </audio>
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+                audio_data = audio_file.read()
+                audio_base64 = base64.b64encode(audio_data).decode()
+
+            st.markdown(
+                f"""
+                <div style="
+                    background-color: #FFD700;
+                    padding: 15px;
+                    border-radius: 12px;
+                    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+                    text-align: center;
+                    margin-bottom: 10px;
+                    font-family: 'Poppins', sans-serif;
+                ">
+                    <h3 style="color: black;">🎵 {file}</h3>
+                    <audio controls style="width: 100%;" controlsList="nodownload">
+                        <source src="data:audio/mpeg;base64,{audio_base64}" type="audio/mpeg">
+                        Your browser does not support the audio element.
+                    </audio>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
 # Streamlit UI
 st.markdown(
