@@ -22,7 +22,7 @@ def check_access_key():
     
     if not st.session_state["authenticated"]:
         access_key = st.text_input("Enter Access Key:", type="password")
-        if st.button("Submit", key="submit_button", help="Click to submit your access key"):
+        if st.button("Submit"):
             with open(KEYS_FILE, "r") as f:
                 valid_keys = json.load(f)
             
@@ -45,42 +45,10 @@ def display_audio_files():
     else:
         for file in audio_files:
             file_path = os.path.join(UPLOAD_FOLDER, file)
-            st.markdown(f"### 🎵 {file}")
+            st.write(f"### 🎵 {file}")
             st.audio(file_path)
 
 # Streamlit UI
-st.markdown(
-    """
-    <style>
-    body {background-color: white; color: black; font-family: 'Poppins', sans-serif;}
-    .stApp {background-color: white; color: black; font-family: 'Poppins', sans-serif;}
-    h1, h2, h3, .stTitle, .stHeader, .stSubheader {
-        color: black !important;
-        font-weight: bold;
-        font-family: 'Poppins', sans-serif;
-    }
-    label {color: black !important; font-weight: bold; font-family: 'Poppins', sans-serif;}
-    .stMarkdown {color: black !important; font-family: 'Poppins', sans-serif;}
-    .stApp>header {display: none !important;}
-    .stButton>button {
-        background-color: gold !important;
-        color: black !important;
-        border: none !important;
-        border-radius: 8px;
-        padding: 12px 24px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-    }
-    .stButton>button:hover {
-        background-color: #FFC107 !important;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True,
-)
-
 st.title("The Early Release List")
 
 if check_access_key():
